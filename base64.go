@@ -10,7 +10,7 @@ import (
 
 func main() {
 	if len(os.Args) < 3 {
-		fmt.Println("Usage: base64 infile outfile [linelength]. If line length is 0, then all the input will be in a line.")
+		fmt.Println("Usage: base64 infile outfile [linelength]. If line length is 0, then all the output will be in a line.")
 		os.Exit(1)
 	}
 
