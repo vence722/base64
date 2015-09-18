@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bytes"
 	"encoding/base64"
 	"fmt"
 	"io/ioutil"
@@ -27,31 +26,32 @@ func main() {
 	of, _ := os.Create(outfile)
 	defer of.Close()
 	data, _ := ioutil.ReadAll(f)
+	
+	base64Str := base64.StdEncoding.EncodeToString(data)
 
-	buf := bytes.NewBuffer([]byte{})
-	encoder := base64.NewEncoder(base64.StdEncoding, buf)
-	defer encoder.Close()
-	encoder.Write(data)
-
-	result := insertLineDelimiter(buf.String(), "\r\n", lineLen)
-
+	result := insertLineDelimiter(base64Str, "\r\n", lineLen)
 	of.WriteString(result)
 }
 
 func insertLineDelimiter(src string, dlm string, lineLen int) string {
 	lenSrc := len(src)
 	lenDlm := len(dlm)
-	lines := lenSrc / lineLen
-	if lenSrc%lineLen == 0 {
-		lines--
+	lines := 0
+	if lineLen > 0 {
+		lines = lenSrc / lineLen
+		if lenSrc%lineLen == 0 {
+			lines--
+		}
 	}
+
 	bufSize := lenSrc + lines*lenDlm
 	buffer := make([]byte, bufSize, bufSize)
 
 	i := 0
 	j := 0
+	needLineDlm := lineLen > 0
 	for i < lenSrc {
-		if i > 0 && i%lineLen == 0 {
+		if needLineDlm && i > 0 && i%lineLen == 0 {
 			for k := 0; k < lenDlm; k++ {
 				buffer[j+k] = byte(dlm[k])
 			}
